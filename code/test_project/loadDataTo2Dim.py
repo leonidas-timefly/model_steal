@@ -94,7 +94,7 @@ for i in range(1, data.shape[0]):
     data_list = np.concatenate((data_list, temp))
 print(data_list)
 print(data_list.shape)
-np.save('trainData2.npy', data)
+np.save('trainData2.npy', data_list)
 np.save('trainLabel2.npy', label)
 
 
@@ -130,8 +130,8 @@ for i in range(1, testdata.shape[0]):
         print(int(i / 70) * "=" + ">")
     temp = [testdata[i].flatten()]
     data_list = np.concatenate((data_list, temp))
-
-np.save('testData2.npy', testdata)
+print(data_list.shape)
+np.save('testData2.npy', data_list)
 np.save('testLabel2.npy', testlabel)
 
 
