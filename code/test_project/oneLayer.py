@@ -4,13 +4,16 @@ from keras.models import Sequential
 from keras.layers import Dense
 import tensorflow as tf
 import numpy as np
+from keras.layers import Activation
+from keras.optimizers import RMSprop
+
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
 session = tf.compat.v1.Session(config=config)
 
 class_num = 20
-input_dim = 224*224
+input_dim = 224*224*3
 
 x_train_all = np.load('trainData2.npy')
 y_train_all = np.load('trainLabel2.npy')
@@ -36,12 +39,24 @@ y_train = y_train_all[train_set]
 x_test = x_test_all[test_set]
 y_test = y_test_all[test_set]
 
-model = Sequential()
-model.add(Dense(output_dim=class_num, input_dim=1))
+x_train = tf.convert_to_tensor(x_train, dtype = tf.float32)
+y_train = tf.convert_to_tensor(y_train, dtype = tf.float32)
+x_test = tf.convert_to_tensor(x_train, dtype = tf.float32)
+y_test = tf.convert_to_tensor(x_train, dtype = tf.float32)
 
-model.compile(loss='mse', optimizer='sgd')
-print('Training ==========')
-for step in range(301):
-    cost = model.train_on_batch(x_train, y_train) # Keras 的 train_on_batch() 函数训练模型
-    if step % 100 == 0:
-        print('train cost: ', cost)
+model = Sequential()
+
+x = Dense(input_dim, name='fc6')(x_train)
+output = Activation('softmax', name='fc6/softmax')(x)
+custom_model = Model(model.input, output)
+
+for layer in custom_model.layers:
+    layer.trainable = True
+
+
+
+custom_model.compile(optimizer=RMSprop(lr=1e-4), loss='categorical_crossentropy', metrics=['accuracy'])
+custom_model.fit(x=x_train, y=y_train, epochs=20, batch_size=16)
+result = custom_model.evaluate(x_test, y_test)
+
+print(result)
