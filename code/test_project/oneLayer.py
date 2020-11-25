@@ -1,11 +1,12 @@
-from keras.layers import Dense, Dropout, Flatten
+from code.test_project import VGGFace
 from keras.engine import Model
-from keras.models import Sequential
-from keras.layers import Dense
-import tensorflow as tf
-import numpy as np
-from keras.layers import Activation
+from keras.layers import Flatten, Dense, Input, Activation
+from keras.optimizers import SGD
 from keras.optimizers import RMSprop
+from keras.optimizers import Adam
+import numpy as np
+import tensorflow as tf
+from keras.layers import Dense, Dropout, Flatten
 
 
 config = tf.compat.v1.ConfigProto()
@@ -13,7 +14,7 @@ config.gpu_options.allow_growth = True
 session = tf.compat.v1.Session(config=config)
 
 class_num = 20
-input_dim = 224*224*3
+input_dim = 50*50*3
 
 x_train_all = np.load('trainData2.npy')
 y_train_all = np.load('trainLabel2.npy')
@@ -38,16 +39,30 @@ x_train = x_train_all[train_set]
 y_train = y_train_all[train_set]
 x_test = x_test_all[test_set]
 y_test = y_test_all[test_set]
+#calculate the num of random int from x_train_all/x_test_all/y_train_all/y_test_all
 
-x_train = tf.convert_to_tensor(x_train, dtype = tf.float32)
-y_train = tf.convert_to_tensor(y_train, dtype = tf.float32)
-x_test = tf.convert_to_tensor(x_train, dtype = tf.float32)
-y_test = tf.convert_to_tensor(x_train, dtype = tf.float32)
+#change the range of target class labels to (1, n)
+for i in range(0,y_train.shape[0]):
+    y_train[i] = train_set_ids.index(y_train[i]) + 1
+for i in range(0, y_test.shape[0]):
+    y_test[i] = train_set_ids.index(y_test[i]) + 1
 
-model = Sequential()
+temp = np.zeros((y_train.shape[0], int(np.max(y_train))))
+temp[np.arange(y_train.shape[0]), y_train.astype(int) - 1] = 1
+y_train = temp
 
-x = Dense(input_dim, name='fc6')(x_train)
-output = Activation('softmax', name='fc6/softmax')(x)
+temp = np.zeros((y_test.shape[0], int(np.max(y_test))))
+temp[np.arange(y_test.shape[0]), y_test.astype(int) - 1] = 1
+y_test = temp
+
+
+print("training begins")
+
+model = VGGFace(model='VGG16', pooling='max')
+last_layer = model.get_layer('conv1_1').output
+
+x = Dense(class_num, name='fc6')(last_layer)
+output = Activation('softmax', name='fc6/softmax')(last_layer)
 custom_model = Model(model.input, output)
 
 for layer in custom_model.layers:

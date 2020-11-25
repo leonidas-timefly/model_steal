@@ -11,7 +11,7 @@ def loadData(dirPath):
         for file in files:
             filename = folder + "/" + file
             print(filename)
-            img = image.load_img(filename, target_size=(224, 224))
+            img = image.load_img(filename, target_size=(50, 50))
             img = image.img_to_array(img)
             img = utils.preprocess_input(img, version=1)
             img_list.append(img)
@@ -83,8 +83,8 @@ print(data.shape[0])
 np.random.shuffle(perm)
 data = data[perm]
 label = label[perm]
-np.save('trainData.npy', data)
-np.save('trainLabel.npy', label)
+np.save('trainData2.npy', data)
+np.save('trainLabel2.npy', label)
 
 
 label0 = np.ones(testdata0.shape[0]) * 1
@@ -113,8 +113,8 @@ testdata = np.concatenate((testdata0, testdata1, testdata2, testdata3, testdata4
 testlabel = np.concatenate((label0, label1, label2, label3, label4, label5, label6, label7, label8, label9,
                         label10, label11, label12, label13, label14, label15, label16, label17, label18, label19), axis=0)
 
-np.save('testData.npy', testdata)
-np.save('testLabel.npy', testlabel)
+np.save('testData2.npy', testdata)
+np.save('testLabel2.npy', testlabel)
 
 
 #after loading traindata, traindata:700*224*224*3 and 700label, every subset 35

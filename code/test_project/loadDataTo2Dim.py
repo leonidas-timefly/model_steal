@@ -13,7 +13,7 @@ def loadData(dirPath):
         for file in files:
             filename = folder + "/" + file
             print(filename)
-            img = image.load_img(filename, target_size=(100, 100))
+            img = image.load_img(filename, target_size=(50, 50))
             img = image.img_to_array(img)
             img = utils.preprocess_input(img, version=1)
             img_list.append(img)
